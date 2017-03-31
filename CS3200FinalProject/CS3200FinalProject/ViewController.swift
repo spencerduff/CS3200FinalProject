@@ -31,6 +31,15 @@ class ViewController: UIViewController {
         
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "displaySegue",
+            let detailVC = segue.destination as? RestaurantDisplayViewController {
+            detailVC.priceRange = priceRanges[priceRangePicker.selectedRow(inComponent: 0)]
+            detailVC.restaurantType = restTypes[restaurantTypePicker.selectedRow(inComponent: 0)]
+        }
+        
+    }
+    
     
 
 }

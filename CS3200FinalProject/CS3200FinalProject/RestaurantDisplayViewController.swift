@@ -9,6 +9,9 @@
 import UIKit
 
 class RestaurantDisplayViewController: UIViewController {
+    
+    var priceRange = ""
+    var restaurantType = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
