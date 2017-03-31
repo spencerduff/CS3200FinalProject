@@ -29,6 +29,10 @@
                             </label>
                             <pickerView contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E7p-fQ-3ce">
                                 <rect key="frame" x="0.0" y="97" width="375" height="175"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="wFq-uS-cin"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="SPp-J1-k2q"/>
+                                </connections>
                             </pickerView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Price Range" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xQp-sz-KaP">
                                 <rect key="frame" x="137" y="277" width="101" height="25"/>
@@ -38,10 +42,18 @@
                             </label>
                             <pickerView contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D0t-WM-sjV">
                                 <rect key="frame" x="1" y="310" width="372" height="175"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="lxW-Ar-Mfp"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="xT3-H3-PI2"/>
+                                </connections>
                             </pickerView>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TWi-Fm-sD4">
                                 <rect key="frame" x="16" y="493" width="343" height="154"/>
                                 <state key="normal" title="Search"/>
+                                <connections>
+                                    <action selector="SearchButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ce2-0g-gfd"/>
+                                    <segue destination="moX-gA-78y" kind="show" id="4t9-EL-sBU"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -61,6 +73,10 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="EZM-ay-dC3"/>
+                    <connections>
+                        <outlet property="priceRangePicker" destination="D0t-WM-sjV" id="xst-EP-GoU"/>
+                        <outlet property="restaurantTypePicker" destination="E7p-fQ-3ce" id="a0W-xE-Ouv"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
