@@ -7,18 +7,26 @@
 //
 
 import UIKit
+import CoreData
+import CoreLocation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var restaurantTypePicker: UIPickerView!
     @IBOutlet weak var priceRangePicker: UIPickerView!
     
+    
+    let locManager = CLLocationManager()
+    
     let priceRanges = [String](arrayLiteral: "Any", "$", "$$", "$$$")
     let restTypes = [String](arrayLiteral: "Any", "Fast Food", "Sit Down", "Fast Casual")
-
+    let accessToken = "8Dqf222-lrNZhZnbgWQTk0kEoRvMjVywr2tL-kS2JjEIfTIH6QZuYGeHLHbKOkGLFcgXjpzIRyiZ2C9KHSMBBNqxE8yCes2wcpJ0NP2f6kjMsNAflM2OpWNLwovtWHYx"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.'
+        
+        locManager.requestWhenInUseAuthorization()
+        makeRequest() // Parse this
         
     }
 
@@ -40,7 +48,35 @@ class ViewController: UIViewController {
         
     }
     
-    
+    func makeRequest() -> [String : Any]{
+        let latitude = locManager.location?.coordinate.latitude
+        let longitude = locManager.location?.coordinate.longitude
+        let toGet = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude!)&longitude=\(longitude!)"
+        let url = URL(string: toGet)
+        var request = URLRequest(url: url!)
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        var toReturn = [String : Any]()
+
+        let task = URLSession.shared.dataTask(with: request) {data, response, error in
+            guard let data = data, error == nil else {
+                print(error ?? "No error")
+                return
+            }
+            print(data)
+            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)
+            if let responseJSON = responseJSON as? [String : Any] {
+                print(responseJSON)
+                toReturn = responseJSON
+            }
+            
+        }
+        task.resume()
+        
+        
+        return toReturn
+        
+    }
 
 }
 
