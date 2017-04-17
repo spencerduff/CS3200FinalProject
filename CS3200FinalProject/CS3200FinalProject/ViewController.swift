@@ -22,11 +22,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let restTypes = [String](arrayLiteral: "Any", "Fast Food", "Sit Down", "Fast Casual")
     let accessToken = "8Dqf222-lrNZhZnbgWQTk0kEoRvMjVywr2tL-kS2JjEIfTIH6QZuYGeHLHbKOkGLFcgXjpzIRyiZ2C9KHSMBBNqxE8yCes2wcpJ0NP2f6kjMsNAflM2OpWNLwovtWHYx"
     
+    var parsedJSON = [[String]]()
+    var unparsedJSON = [String : Any]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        locManager.requestWhenInUseAuthorization()
-        makeRequest() // Parse this
+        locManager.delegate = self
+        locManager.desiredAccuracy = kCLLocationAccuracyKilometer
+        
+        if CLLocationManager.authorizationStatus() != .authorizedWhenInUse{
+            locManager.requestWhenInUseAuthorization()
+        }
+        else{
+            locManager.requestLocation()
+            parseJSON(json: makeRequest())
+        }
         
     }
 
@@ -48,7 +59,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
     }
     
-    func makeRequest() -> [String : Any]{
+    func makeRequest() -> [[String : Any]]{
         let latitude = locManager.location?.coordinate.latitude
         let longitude = locManager.location?.coordinate.longitude
         let toGet = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude!)&longitude=\(longitude!)"
@@ -56,7 +67,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         var request = URLRequest(url: url!)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
-        var toReturn = [String : Any]()
+        var toReturn = [[String : Any]]()
 
         let task = URLSession.shared.dataTask(with: request) {data, response, error in
             guard let data = data, error == nil else {
@@ -65,7 +76,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
             print(data)
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)
-            if let responseJSON = responseJSON as? [String : Any] {
+            if let responseJSON = responseJSON as? [[String : Any]] {
                 print(responseJSON)
                 toReturn = responseJSON
             }
@@ -77,7 +88,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         return toReturn
         
     }
-
+    
+    func parseJSON(json: [[String : Any]]) {
+        
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse{
+            manager.requestLocation()
+        }
+        else{
+            // no permission
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        //
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        //
+    }
+    
 }
 
 extension ViewController : UIPickerViewDataSource {
