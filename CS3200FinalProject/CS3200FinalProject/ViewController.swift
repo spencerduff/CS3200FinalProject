@@ -19,11 +19,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     let locManager = CLLocationManager()
     
     let priceRanges = [String](arrayLiteral: "Any", "$", "$$", "$$$")
-    let restTypes = [String](arrayLiteral: "Any", "Fast Food", "Sit Down", "Fast Casual")
+    let distTypes = [String](arrayLiteral: "Any", "<1000", "<2000", ">2000")
     let accessToken = "8Dqf222-lrNZhZnbgWQTk0kEoRvMjVywr2tL-kS2JjEIfTIH6QZuYGeHLHbKOkGLFcgXjpzIRyiZ2C9KHSMBBNqxE8yCes2wcpJ0NP2f6kjMsNAflM2OpWNLwovtWHYx"
     
-    var parsedJSON = [[String]]()
-    var unparsedJSON = [String : Any]()
+    var parsedRestaurants = [[String]]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,12 +31,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locManager.delegate = self
         locManager.desiredAccuracy = kCLLocationAccuracyKilometer
         
+        
         if CLLocationManager.authorizationStatus() != .authorizedWhenInUse{
             locManager.requestWhenInUseAuthorization()
+            if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse){
+                locManager.requestLocation()
+            }
         }
         else{
             locManager.requestLocation()
-            parseJSON(json: makeRequest())
         }
         
     }
@@ -54,12 +57,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         if segue.identifier == "displaySegue",
             let detailVC = segue.destination as? RestaurantDisplayViewController {
             detailVC.priceRange = priceRanges[priceRangePicker.selectedRow(inComponent: 0)]
-            detailVC.restaurantType = restTypes[restaurantTypePicker.selectedRow(inComponent: 0)]
+            detailVC.restaurantType = distTypes[restaurantTypePicker.selectedRow(inComponent: 0)]
+            detailVC.toParse = parsedRestaurants
         }
         
     }
     
-    func makeRequest() -> [[String : Any]]{
+    func makeRequest() {
         let latitude = locManager.location?.coordinate.latitude
         let longitude = locManager.location?.coordinate.longitude
         let toGet = "https://api.yelp.com/v3/businesses/search?latitude=\(latitude!)&longitude=\(longitude!)"
@@ -67,29 +71,40 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         var request = URLRequest(url: url!)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "GET"
-        var toReturn = [[String : Any]]()
 
         let task = URLSession.shared.dataTask(with: request) {data, response, error in
             guard let data = data, error == nil else {
                 print(error ?? "No error")
                 return
             }
-            print(data)
+            print(String(data: data, encoding: .utf8) ?? "")
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers)
-            if let responseJSON = responseJSON as? [[String : Any]] {
-                print(responseJSON)
-                toReturn = responseJSON
+            if let responseJSON = responseJSON as? [String : Any] {
+                //print(responseJSON)
+                self.parseJSON(json: responseJSON)
             }
             
         }
         task.resume()
-        
-        
-        return toReturn
-        
     }
     
-    func parseJSON(json: [[String : Any]]) {
+    func parseJSON(json: [String : Any]) {
+        guard let businessArray = json["businesses"] as? [[String : AnyObject]] else{
+            return
+        }
+        for i in businessArray {
+            var toAdd = [String]()
+            toAdd.append(i["name"] as! String)
+            toAdd.append(i["price"] as! String)
+            
+            let loc = i["location"]
+            toAdd.append(loc?["address1"] as! String)
+            toAdd.append(String(i["distance"] as! Double))
+            toAdd.append(i["image_url"] as! String)
+            
+            parsedRestaurants.append(toAdd)
+        }
+        
         
     }
     
@@ -103,7 +118,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        //
+        makeRequest()
+        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -124,7 +140,7 @@ extension ViewController : UIPickerViewDataSource {
 extension ViewController : UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == restaurantTypePicker{
-            return restTypes[row]
+            return distTypes[row]
         }else{
             return priceRanges[row]
         }
