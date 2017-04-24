@@ -95,7 +95,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         for i in businessArray {
             var toAdd = [String]()
             toAdd.append(i["name"] as! String)
-            toAdd.append(i["price"] as! String)
+            guard let iprice = i["price"] as? String
+            
+                else{
+                    return
+            }
+            
+            toAdd.append(iprice)
             
             let loc = i["location"]
             toAdd.append(loc?["address1"] as! String)
