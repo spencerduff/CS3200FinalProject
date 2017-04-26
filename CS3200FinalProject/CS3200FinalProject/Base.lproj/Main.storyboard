@@ -77,6 +77,7 @@
                     <connections>
                         <outlet property="priceRangePicker" destination="D0t-WM-sjV" id="xst-EP-GoU"/>
                         <outlet property="restaurantTypePicker" destination="E7p-fQ-3ce" id="a0W-xE-Ouv"/>
+                        <outlet property="searchBtn" destination="TWi-Fm-sD4" id="ypb-Il-3TH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

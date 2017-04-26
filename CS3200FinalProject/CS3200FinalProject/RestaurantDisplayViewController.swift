@@ -56,10 +56,10 @@ class RestaurantDisplayViewController: UIViewController {
         if restaurantType == "Any" {
             typeSelection = Set(near + med + far)
         }
-        else if restaurantType == "<1000"{
+        else if restaurantType == "<2000"{
             typeSelection = Set(near)
         }
-        else if restaurantType == "<2000"{
+        else if restaurantType == "<7000"{
             typeSelection = Set(med + near)
         }
         else { // fastcasual
@@ -118,10 +118,10 @@ class RestaurantDisplayViewController: UIViewController {
             let imageURL = i[4]
             let restaurant = Restaurant(pr: price, d: distance, n: name, a: location, i: imageURL)
             let dis = Double(distance)
-            if (dis! >= 2000.0){
+            if (dis! >= 7000.0){
                 far.append(restaurant)
             }
-            else if (dis! >= 1000.0){
+            else if (dis! >= 2000.0){
                 med.append(restaurant)
             }
             else{

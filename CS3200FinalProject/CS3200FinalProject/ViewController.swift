@@ -14,12 +14,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var restaurantTypePicker: UIPickerView!
     @IBOutlet weak var priceRangePicker: UIPickerView!
+    @IBOutlet weak var searchBtn: UIButton!
     
     
     let locManager = CLLocationManager()
     
     let priceRanges = [String](arrayLiteral: "Any", "$", "$$", "$$$")
-    let distTypes = [String](arrayLiteral: "Any", "<1000", "<2000", ">2000")
+    let distTypes = [String](arrayLiteral: "Any", "<2000", "<7000", ">7000")
     let accessToken = "8Dqf222-lrNZhZnbgWQTk0kEoRvMjVywr2tL-kS2JjEIfTIH6QZuYGeHLHbKOkGLFcgXjpzIRyiZ2C9KHSMBBNqxE8yCes2wcpJ0NP2f6kjMsNAflM2OpWNLwovtWHYx"
     
     var parsedRestaurants = [[String]]()
@@ -27,6 +28,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        searchBtn.isEnabled = false
         
         locManager.delegate = self
         locManager.desiredAccuracy = kCLLocationAccuracyKilometer
@@ -83,7 +86,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 //print(responseJSON)
                 self.parseJSON(json: responseJSON)
             }
-            
+            self.searchBtn.isEnabled = true
         }
         task.resume()
     }
